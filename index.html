@@ -34,7 +34,9 @@
       const inputUrl = document.getElementById("url").value;
       const url = new URL(inputUrl);
       const id = new URLSearchParams(url.search).get("meetingId");
-      await ffmpeg.load();
+      if(!ffmpeg.isLoaded()) {
+        await ffmpeg.load();
+      }
       const w1 = await ffmpeg.FS("writeFile", "deskshare.webm", await fetchFile(url.origin, id, "deskshare"));
       const w2 = await ffmpeg.FS("writeFile", "webcams.webm", await fetchFile(url.origin, id, "video"));
       await ffmpeg.run("-i", "deskshare.webm", "-i", "webcams.webm", "-c", "copy", "output.webm");
