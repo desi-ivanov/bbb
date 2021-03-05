@@ -1,0 +1,55 @@
+<body style="margin: 0px;">
+  <input
+    placeholder="https://bbb-cluster.example.it/playback/presentation/2.0/playback.html?meetingId=xxxxxxxxxxxxxxxxxxxxxxxxxx"
+    style="width:100%" id="url"></input>
+  <br />
+  <button id="btn">Start</button>
+  <br />
+  <br />
+  <div id="progress" style="width: 100%; height: 10px; border:1px solid gray">
+    <div id="progress-bar" style="height: 10px; width: 0px; background-color: lightskyblue;" />
+  </div>
+  <br />
+  <video style="width: 100%;" controls id="output-video" />
+</body>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js"></script>
+<script>
+  const { createFFmpeg } = FFmpeg;
+  const ffmpeg = createFFmpeg({
+    log: true,
+    progress: ({ ratio }) => document.getElementById("progress-bar").style.width = `${ratio * 100}%`,
+  });
+
+  async function fetchFile(origin, id, type) {
+    const res = await fetch("https://us-central1-my-site-8a7fb.cloudfunctions.net/bbb", {
+      method: "POST",
+      body: JSON.stringify({ origin, id, type }),
+    });
+    if(!res.ok) throw "Couldn't download video file(s)";
+    return new Uint8Array(await res.arrayBuffer());
+  }
+  async function go() {
+    document.getElementById("btn").setAttribute("disabled", "true");
+    try {
+      const inputUrl = document.getElementById("url").value;
+      const url = new URL(inputUrl);
+      const id = new URLSearchParams(url.search).get("meetingId");
+      await ffmpeg.load();
+      const w1 = await ffmpeg.FS("writeFile", "deskshare.webm", await fetchFile(url.origin, id, "deskshare"));
+      const w2 = await ffmpeg.FS("writeFile", "webcams.webm", await fetchFile(url.origin, id, "video"));
+      await ffmpeg.run("-i", "deskshare.webm", "-i", "webcams.webm", "-c", "copy", "output.webm");
+      const data = await ffmpeg.FS("readFile", "output.webm");
+      const video = document.getElementById("output-video");
+      video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/webm' }));
+    } catch(err) {
+      alert(String(err));
+    } finally {
+      document.getElementById("btn").removeAttribute("disabled");
+    }
+  }
+
+
+  document.getElementById("btn").addEventListener("click", go);
+
+
+</script>
