@@ -21,9 +21,10 @@
   });
 
   async function fetchFile(origin, id, type) {
-    const res = await fetch("https://us-central1-my-site-8a7fb.cloudfunctions.net/bbb", {
+    const res = await fetch("https://bbbdl.herokuapp.com/", {
       method: "POST",
       body: JSON.stringify({ origin, id, type }),
+      headers: { "Content-Type": "application/json" }
     });
     if(!res.ok) throw "Couldn't download video file(s)";
     return new Uint8Array(await res.arrayBuffer());

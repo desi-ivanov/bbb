@@ -1,0 +1,23 @@
+const { json } = require("body-parser");
+const fetch = require("node-fetch");
+const cors = require('cors');
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 5000;
+app.use(json());
+app.use(cors());
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+app.post("/", async (request, response) => {
+  const { origin, id, type } = typeof request.body === "string" ? JSON.parse(request.body) : request.body;
+  const url = `${origin}/presentation/${id}/${type === "deskshare" ? "deskshare/deskshare.webm" : "video/webcams.webm"}`;
+  const bbbRes = await fetch(url);
+  response.header('Access-Control-Allow-Origin', '*');
+  response.header('Access-Control-Allow-Headers', '*');
+  const copyheader = header => response.setHeader(header, bbbRes.headers.get(header));
+  copyheader('content-type');
+  copyheader('content-length');
+  copyheader('etag');
+  copyheader('accept-ranges');
+  bbbRes.body.pipe(response);
+  response.status(200);
+});
