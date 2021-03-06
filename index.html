@@ -4,7 +4,9 @@
     style="width:100%" id="url"></input>
   <br />
   <button id="btn">Start</button>
+  <div id="spinner"></div>
   <br />
+  <div id="logging"></div>
   <br />
   <div id="progress" style="width: 100%; height: 10px; border:1px solid gray">
     <div id="progress-bar" style="height: 10px; width: 0px; background-color: lightskyblue;" />
@@ -31,15 +33,22 @@
   }
   async function go() {
     document.getElementById("btn").setAttribute("disabled", "true");
+    document.getElementById("spinner").style.display = "block";
+    const logging = document.getElementById("logging");
+    logging.innerHTML = "";
     try {
       const inputUrl = document.getElementById("url").value;
       const url = new URL(inputUrl);
       const id = new URLSearchParams(url.search).get("meetingId");
+      logging.innerHTML += "<br />Downloading ffmpeg";
       if(!ffmpeg.isLoaded()) {
         await ffmpeg.load();
       }
+      logging.innerHTML += "<br />Downloading deskshare.webm";
       const w1 = await ffmpeg.FS("writeFile", "deskshare.webm", await fetchFile(url.origin, id, "deskshare"));
+      logging.innerHTML += "<br />Downloading webcams.webm";
       const w2 = await ffmpeg.FS("writeFile", "webcams.webm", await fetchFile(url.origin, id, "video"));
+      logging.innerHTML += "<br />Executing ffmpeg";
       await ffmpeg.run("-i", "deskshare.webm", "-i", "webcams.webm", "-c", "copy", "output.webm");
       const data = await ffmpeg.FS("readFile", "output.webm");
       const video = document.getElementById("output-video");
@@ -48,11 +57,27 @@
       alert(String(err));
     } finally {
       document.getElementById("btn").removeAttribute("disabled");
+      document.getElementById("spinner").style.display = "none";
     }
   }
-
-
   document.getElementById("btn").addEventListener("click", go);
-
-
 </script>
+<style>
+  #spinner {
+    display: none;
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid lightskyblue;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
