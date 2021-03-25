@@ -20,6 +20,7 @@
 <script>
   const { createFFmpeg } = FFmpeg;
   const ffmpeg = createFFmpeg({
+    corePath: 'https://unpkg.com/@ffmpeg/core@0.8.5/dist/ffmpeg-core.js',
     log: true,
     progress: ({ ratio }) => document.getElementById("progress-bar").style.width = `${ratio * 100}%`,
   });
