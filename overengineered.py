@@ -30,11 +30,26 @@ def hex_to_brg(hex: str):
   return tuple(int(h[i:i+2], 16) for i in (4, 2, 0))
 
 def path_str_to_poly(p: str):
-  # p = "M217.05484 621.57536L217.05483 621.57539L215.00003 619.5206L206.78085 613.35619L206.78085 611.30141L198.56167 605.13706L196.50687 603.08221L190.34249 601.02743L184.17811 603.08221L173.90413 609.24662L165.68497 617.46582L155.41099 627.7398L147.19181 638.01371L134.86304 654.45211L130.75345 666.78087L126.64386 677.05485"
+  # p = "M217.05484 621.57536
+  # 217.05483 621.57539
+  # 215.00003 619.5206
+  # 206.78085 613.35619
+  # 206.78085 611.30141
+  # 198.56167 605.13706
+  # 196.50687 603.08221
+  # 190.34249 601.02743
+  # 184.17811 603.08221
+  # 173.90413 609.24662
+  # 165.68497 617.46582
+  # 155.41099 627.7398
+  # 147.19181 638.01371
+  # 134.86304 654.45211
+  # 130.75345 666.78087
+  # 126.64386 677.05485"
   poss = re.split("M|L|\s|,|C", p)[1:]
   cols = []
   for i in range(int(len(poss) / 2) -1):
-    cols.append([int(float(poss[i*2]) / VIEWBOX_WIDTH * WIDTH), int(float(poss[(i+1)*2]) / VIEWBOX_HEIGHT * HEIGHT)])
+    cols.append([int(float(poss[i*2]) ), int((float(poss[i*2+1])) )])
   
   return np.array(cols).reshape((-1,1,2))
 
@@ -77,33 +92,37 @@ frames = int(duration_milliseconds / 1000 * FPS)
 print("Rendering")
 cursor_x = 0
 cursor_y = 0
+
+cur_drawings = []
+
 for frame in tqdm(range(frames)):
   cur_cursor = cursors[cur_cursor_idx]
   
   cursor_x = int((float(cur_cursor[1][0])) * WIDTH)
   cursor_y = int((float(cur_cursor[1][1])) * HEIGHT)
 
-  cur_drawing = drawings[cur_drawing_idx]
   attr, slide_img = images[cur_slide_idx]
 
   frame_img = deepcopy(slide_img)
 
   cv2.circle(frame_img, (cursor_x, cursor_y), 7, (0, 0, 255), -1)
-  cv2.polylines(frame_img, [cur_drawing[0]], False, hex_to_brg(cur_drawing[2]["stroke"]), int(float(cur_drawing[2]["stroke-width"])))
+  for drawing in cur_drawings:
+    cv2.polylines(frame_img, [drawing[0]], False, hex_to_brg(drawing[2]["stroke"]), int(float(drawing[2]["stroke-width"])))
 
   out.write(frame_img)
 
   cur_second = (float(frame) / float(frames)) * (float(duration_milliseconds) / 1000.0)
-  print(cur_second)
 
-  while(cur_slide_idx < len(images) - 1 and cur_second >= float(attr["out"])):
+  while(cur_slide_idx < len(images) - 1 and cur_second >= float(images[cur_slide_idx][0]["out"])):
     cur_slide_idx = cur_slide_idx + 1
+    cur_drawings = []
   
-  while(cur_cursor_idx < len(cursors) - 1 and cur_second >= float(cur_cursor[0])):
+  while(cur_cursor_idx < len(cursors) - 1 and cur_second >= float(cursors[cur_cursor_idx][0])):
     cur_cursor_idx = cur_cursor_idx + 1
 
-  while(cur_drawing_idx < len(drawings) - 1 and cur_second >= float(cur_drawing[1])):
+  while(cur_drawing_idx < len(drawings) - 1 and cur_second >= float(drawings[cur_drawing_idx][1])):
     cur_drawing_idx = cur_drawing_idx + 1
+    cur_drawings.append(drawings[cur_drawing_idx])
 
 out.release()
 
