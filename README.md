@@ -21,7 +21,7 @@ python3 overengineered.py ORIGIN MEETING_ID FPS OUTPUT_FILE.mkv
 python3 overengineered.py "https://your-bbb-cluster.com" "xxxxxx-yyyyy" 5 output.mkv
 ```
 
-The `FPS` arg can be usded to speed-up (or down) the rendering.
+The `FPS` arg can be used to speed-up (or down) the rendering.
 
 Requirements for the script:
 - FFmpeg (system)
@@ -31,4 +31,4 @@ Requirements for the script:
 - tqdm (python)
 
 ## License
-MIT
+GPL-3.0 License
