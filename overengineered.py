@@ -16,6 +16,7 @@ FPS = int(fps)
 
 def format_url(path: str):
   return "{}/presentation/{}/{}".format(origin, meeting_id, path)
+  
 def fetch(path: str):
     url = format_url(path)
     f = urllib.request.urlopen(url)
@@ -114,4 +115,4 @@ out.release()
 print("Done rendering")
 print("Downloading audio")
 webcams = urllib.request.urlretrieve(format_url("video/webcams.webm"), "webcams.webm")
-os.system("ffmpeg -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy output.mkv")
+os.system("ffmpeg -y -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy output.mkv")
