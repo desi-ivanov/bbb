@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import sys
 from tqdm import tqdm
 import re
+import os
 
 from copy import deepcopy
 
@@ -30,22 +31,6 @@ def hex_to_brg(hex: str):
   return tuple(int(h[i:i+2], 16) for i in (4, 2, 0))
 
 def path_str_to_poly(p: str):
-  # p = "M217.05484 621.57536
-  # 217.05483 621.57539
-  # 215.00003 619.5206
-  # 206.78085 613.35619
-  # 206.78085 611.30141
-  # 198.56167 605.13706
-  # 196.50687 603.08221
-  # 190.34249 601.02743
-  # 184.17811 603.08221
-  # 173.90413 609.24662
-  # 165.68497 617.46582
-  # 155.41099 627.7398
-  # 147.19181 638.01371
-  # 134.86304 654.45211
-  # 130.75345 666.78087
-  # 126.64386 677.05485"
   poss = re.split("M|L|\s|,|C", p)[1:]
   cols = []
   for i in range(int(len(poss) / 2) -1):
@@ -129,3 +114,4 @@ out.release()
 print("Done rendering")
 print("Downloading audio")
 webcams = urllib.request.urlretrieve(format_url("video/webcams.webm"), "webcams.webm")
+os.system("ffmpeg -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy output.mkv")
