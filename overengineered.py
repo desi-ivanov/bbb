@@ -1,4 +1,3 @@
-from typing import final
 import cv2
 import numpy as np
 import urllib.request
@@ -7,12 +6,12 @@ import sys
 from tqdm import tqdm
 import re
 import os
-
 from copy import deepcopy
 
 _, origin, meeting_id, fps = sys.argv
 
 FPS = int(fps)
+output_name = sys.argv[4] if len(sys.argv) > 4 != None else "output.mkv" 
 
 def format_url(path: str):
   return "{}/presentation/{}/{}".format(origin, meeting_id, path)
@@ -52,7 +51,6 @@ def parse_svg_entry(z: ET.Element):
 print("Downloading shapes")
 
 shapes = ET.fromstring(fetch("shapes.svg").decode("utf8"))
-_, _, VIEWBOX_WIDTH, VIEWBOX_HEIGHT = [int(x) for x in shapes.attrib["viewBox"].split(" ")]
 images = [(x.attrib, dw_image(x.attrib["{http://www.w3.org/1999/xlink}href"])) for x in shapes.findall("{http://www.w3.org/2000/svg}image")]
 
 WIDTH = images[0][1].shape[1]
@@ -61,7 +59,7 @@ HEIGHT = images[0][1].shape[0]
 drawings = [parse_svg_entry(z) for sl in [x.findall("{http://www.w3.org/2000/svg}g") for x in shapes.findall("{http://www.w3.org/2000/svg}g")] for z in sl if z.find("{http://www.w3.org/2000/svg}path") != None]
 
 cursor_data = ET.fromstring(fetch("cursor.xml").decode("utf8"))
-cursors = list(map(lambda x: (x.attrib["timestamp"], x.find("cursor").text.split(" ")), cursor_data.findall("event")))
+cursors = [(x.attrib["timestamp"], x.find("cursor").text.split(" ")) for x in cursor_data.findall("event")]
 
 metadata = ET.fromstring(fetch("metadata.xml").decode("utf8"))
 duration_milliseconds = int(metadata.find("playback").find("duration").text)
@@ -115,4 +113,4 @@ out.release()
 print("Done rendering")
 print("Downloading audio")
 webcams = urllib.request.urlretrieve(format_url("video/webcams.webm"), "webcams.webm")
-os.system("ffmpeg -y -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy output.mkv")
+os.system("ffmpeg -y -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy {}".format(output_name))
