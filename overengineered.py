@@ -8,10 +8,10 @@ import re
 import os
 from copy import deepcopy
 
-_, origin, meeting_id, fps = sys.argv
-
-FPS = int(fps)
-output_name = sys.argv[4] if len(sys.argv) > 4 != None else "output.mkv" 
+origin = sys.argv[1]
+meeting_id = sys.argv[2]
+FPS = int(sys.argv[3])
+output_name = sys.argv[4] if len(sys.argv) > 4 else "output.mkv" 
 
 def format_url(path: str):
   return "{}/presentation/{}/{}".format(origin, meeting_id, path)
@@ -69,7 +69,8 @@ cur_cursor_idx = 0
 cur_drawing_idx = 0
 
 fourcc = cv2.VideoWriter_fourcc(*"X264")
-out = cv2.VideoWriter('deskshare.mkv', fourcc, FPS, (WIDTH, HEIGHT))
+DESKSHARE_PATH = "deskshare-{}.mkv".format(meeting_id)
+out = cv2.VideoWriter(DESKSHARE_PATH, fourcc, FPS, (WIDTH, HEIGHT))
 frames = int(duration_milliseconds / 1000 * FPS)
 
 
@@ -112,5 +113,6 @@ out.release()
 
 print("Done rendering")
 print("Downloading audio")
-webcams = urllib.request.urlretrieve(format_url("video/webcams.webm"), "webcams.webm")
-os.system("ffmpeg -y -i deskshare.mkv -i webcams.webm -map 0 -map 1 -acodec copy -vcodec copy {}".format(output_name))
+WEBCAMS_PATH = "webcams{}.webm".format(meeting_id)
+webcams = urllib.request.urlretrieve(format_url("video/webcams.webm"), WEBCAMS_PATH)
+os.system("ffmpeg -y -i {} -i {} -map 0 -map 1 -acodec copy -vcodec copy {}".format(DESKSHARE_PATH, WEBCAMS_PATH, output_name))
