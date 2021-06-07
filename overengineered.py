@@ -94,7 +94,7 @@ for frame in tqdm(range(frames)):
 
   cv2.circle(frame_img, (cursor_x, cursor_y), 7, (0, 0, 255), -1)
   for drawing in cur_drawings:
-    if(drawing[3] < cur_second):
+    if(drawing[3] < 0 or cur_second < drawing[3]):
       cv2.polylines(frame_img, [drawing[0]], False, hex_to_brg(drawing[2]["stroke"]), int(float(drawing[2]["stroke-width"])))
 
   out.write(frame_img)
