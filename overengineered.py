@@ -45,7 +45,8 @@ def parse_svg_entry(z: ET.Element):
   return (
     path_str_to_poly(z.find("{http://www.w3.org/2000/svg}path").attrib["d"]),
     float(z.attrib["timestamp"]), 
-    parse_svg_style(z.attrib["style"])
+    parse_svg_style(z.attrib["style"]),
+    float(z.attrib["undo"])
   )
 
 print("Downloading shapes")
@@ -92,7 +93,8 @@ for frame in tqdm(range(frames)):
 
   cv2.circle(frame_img, (cursor_x, cursor_y), 7, (0, 0, 255), -1)
   for drawing in cur_drawings:
-    cv2.polylines(frame_img, [drawing[0]], False, hex_to_brg(drawing[2]["stroke"]), int(float(drawing[2]["stroke-width"])))
+    if(drawing[3] < cur_second):
+      cv2.polylines(frame_img, [drawing[0]], False, hex_to_brg(drawing[2]["stroke"]), int(float(drawing[2]["stroke-width"])))
 
   out.write(frame_img)
 
