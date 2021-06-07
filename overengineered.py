@@ -11,7 +11,7 @@ from copy import deepcopy
 origin = sys.argv[1]
 meeting_id = sys.argv[2]
 FPS = int(sys.argv[3])
-output_name = sys.argv[4] if len(sys.argv) > 4 else "output.mkv" 
+output_name = sys.argv[4] if len(sys.argv) > 4 else "output-{}.mkv".format(meeting_id)
 
 def format_url(path: str):
   return "{}/presentation/{}/{}".format(origin, meeting_id, path)
@@ -58,6 +58,7 @@ WIDTH = images[0][1].shape[1]
 HEIGHT = images[0][1].shape[0]
 
 drawings = [parse_svg_entry(z) for sl in [x.findall("{http://www.w3.org/2000/svg}g") for x in shapes.findall("{http://www.w3.org/2000/svg}g")] for z in sl if z.find("{http://www.w3.org/2000/svg}path") != None]
+drawings = sorted(drawings, key=lambda x: x[1])
 
 cursor_data = ET.fromstring(fetch("cursor.xml").decode("utf8"))
 cursors = [(x.attrib["timestamp"], x.find("cursor").text.split(" ")) for x in cursor_data.findall("event")]
