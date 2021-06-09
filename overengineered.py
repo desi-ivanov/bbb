@@ -68,7 +68,7 @@ duration_milliseconds = int(metadata.find("playback").find("duration").text)
 
 cur_slide_idx = 0
 cur_cursor_idx = 0
-cur_drawing_idx = 0
+next_drawing_idx = 0
 
 fourcc = cv2.VideoWriter_fourcc(*"X264")
 DESKSHARE_PATH = "deskshare-{}.mkv".format(meeting_id)
@@ -108,9 +108,9 @@ for frame in tqdm(range(frames)):
   while(cur_cursor_idx < len(cursors) - 1 and cur_second >= float(cursors[cur_cursor_idx][0])):
     cur_cursor_idx = cur_cursor_idx + 1
 
-  while(cur_drawing_idx < len(drawings) - 1 and cur_second >= float(drawings[cur_drawing_idx][1])):
-    cur_drawing_idx = cur_drawing_idx + 1
-    cur_drawings.append(drawings[cur_drawing_idx])
+  while(next_drawing_idx < len(drawings) and cur_second >= float(drawings[next_drawing_idx][1])):
+    cur_drawings.append(drawings[next_drawing_idx])
+    next_drawing_idx = next_drawing_idx + 1
 
 out.release()
 
