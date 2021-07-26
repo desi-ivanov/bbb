@@ -1,0 +1,5 @@
+#!/bin/bash
+npm install
+mkdir -p public/static/js
+cp node_modules/@ffmpeg/ffmpeg/dist/ffmpeg.min.js public/static/js/ffmpeg.min.js
+cp node_modules/@ffmpeg/core/dist/* public/static/js/
