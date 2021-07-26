@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  render-bbb:
+    image: render-bbb
+    build: .
+    ports:
+      - "5000:8080"

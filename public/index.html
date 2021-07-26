@@ -1,4 +1,8 @@
 <body>
+  <p>Open-source on GitHub: <a href="https://github.com/EvolveYourMind/bbb">https://github.com/EvolveYourMind/bbb</a></p>
+  <p>This web version only works on latest desktop browsers with meetings created through desktop sharing.</p>
+  <p>Slides-only meetings are not supported.</p>
+  <p>If you have issues with the web version you can use our telegram bot here <a href="https://t.me/bbb_renderer_bot">@bbb_renderer_bot</a> or you can use the scripts available in the repository.</p>
   <input
     placeholder="https://bbb-cluster.example.it/playback/presentation/2.0/playback.html?meetingId=xxxxxxxxxxxxxxxxxxxxxxxxxx"
     style="width:100%" id="url"></input>
@@ -15,9 +19,6 @@
   <div style="resize: both; padding: 5px; overflow: auto; max-height: fit-content; max-width: 100%; border: 1px solid black; width: 800px; height: 600px;">
     <video style="width: 100%; min-height: 400px; height: 100%" controls id="output-video"></video>
   </div>
-  <p>
-    This web version only works with meetings created through desktop sharing. Slides-only meetings are not supported, use the overengineered.py script to render them locally.
-  </p>
 </body>
 <script src="/static/js/ffmpeg.min.js"></script>
 <script>
