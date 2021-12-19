@@ -45,10 +45,10 @@ def parse_svg_entry(z: ET.Element):
     float(z.attrib["undo"])
   )
 
-def render(origin: str, meeting_id: str, fps: int, output_name: str, logger: FunctionType):
+def render(origin: str, meeting_id: str, fps: int, output_path: str, logger: FunctionType):
   DESKSHARE_PATH = "/tmp/deskshare-{}.mkv".format(meeting_id)
   WEBCAMS_PATH = "/tmp/webcams{}.webm".format(meeting_id)
-  OUTPUT_PATH = "/tmp/{}.mkv".format(output_name)
+  OUTPUT_PATH = output_path + ".mkv"
 
   logger("Downloading shapes")
 
@@ -130,5 +130,5 @@ if __name__ == "__main__":
   origin = sys.argv[1]
   meeting_id = sys.argv[2]
   fps = int(sys.argv[3])
-  output_name = sys.argv[4] if len(sys.argv) > 4 else meeting_id
-  render(origin, meeting_id, fps, output_name, print)
+  output_path = sys.argv[4] if len(sys.argv) > 4 else ("./" + meeting_id)
+  render(origin, meeting_id, fps, output_path, print)

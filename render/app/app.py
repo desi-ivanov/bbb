@@ -19,7 +19,7 @@ def main(jsonbody):
 
   origin = jsonbody["origin"]
   meeting_id = jsonbody["meeting_id"]
-  output_name = meeting_id
+  output_name = "/tmp/" + meeting_id
 
   res = requests.head("{}/presentation/{}/deskshare/deskshare.webm".format(origin, meeting_id))
 
